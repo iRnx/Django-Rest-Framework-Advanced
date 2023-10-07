@@ -17,11 +17,18 @@ from django.contrib import admin
 from django.urls import path, include
 
 from cursos.urls import router
+from rest_framework.routers import SimpleRouter
 
+
+from usuarios.views import UsuariosViewSet
+
+router_usuario = SimpleRouter()
+router_usuario.register('cadastrar_usuario', UsuariosViewSet, basename='Cadastrar Usuário')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('auth/', include('rest_framework.urls')),
     path('api/v1/', include('cursos.urls')),
-    path('api/v2/', include(router.urls))
+    path('api/v2/', include(router.urls)),
+    path('', include(router_usuario.urls)),
 ]

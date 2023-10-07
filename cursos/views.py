@@ -5,9 +5,12 @@ from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import mixins
+from rest_framework.permissions import DjangoModelPermissions, IsAuthenticated
+from rest_framework.authentication import TokenAuthentication
 
 from .models import Curso, Avaliacao
 from .serializers import CursoSerializer, AvaliacaoSerializer
+from .permissions import EhSuperUser
 
 """
 API versão 1
@@ -57,19 +60,22 @@ API versão 2
 
 
 class CursoViewSet(viewsets.ModelViewSet):
+    # permission_classes = (EhSuperUser, DjangoModelPermissions)
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [TokenAuthentication]
     queryset = Curso.objects.all()
     serializer_class = CursoSerializer
 
-    @action(detail=True, methods=['get']) # este decorator com detail true para criar a rota
+    @action(detail=True, methods=['get'])
     def avaliacoes(self, request, pk=None):
 
-        self.pagination_class.page_size = 1
-        avaliacoes = Avaliacao.objects.filter(curso_id=pk)
-        page = self.paginate_queryset(avaliacoes)
+        # self.pagination_class.page_size = 1
+        avaliacoes = Avaliacao.objects.filter(curso__id=pk)
+        # page = self.paginate_queryset(avaliacoes)
 
-        if page is not None:
-            serializer = AvaliacaoSerializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
+        # if page is not None:
+        #     serializer = AvaliacaoSerializer(page, many=True)
+        #     return self.get_paginated_response(serializer.data)
 
         # curso = self.get_object()
         # print(curso)
